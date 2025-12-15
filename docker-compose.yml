@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: learnhub-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_DATABASE: learnhub
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - learnhub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./LearnHub_backend 
+      dockerfile: Dockerfile
+    container_name: learnhub-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/learnhub?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: your_password
+      JWT_SECRET: learnhub-secret-key-for-jwt-authentication
+      GEMINI_API_KEY: your-gemini-api-key
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - learnhub-network
+
+  frontend:
+    build:
+      context: ./LearnHub_frontend
+      dockerfile: Dockerfile
+    container_name: learnhub-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - learnhub-network
+
+networks:
+  learnhub-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
