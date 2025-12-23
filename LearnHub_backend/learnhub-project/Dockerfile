@@ -11,6 +11,7 @@ COPY gradlew ./
 # 의존성 다운로드 (캐시 레이어)
 RUN ./gradlew dependencies --no-daemon || true
 
+RUN chmod +x ./gradlew
 # 소스 코드 복사
 COPY src ./src
 
@@ -42,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-Dspring.jpa.hibernate.ddl-auto=update", "-jar", "app.jar"]
