@@ -8,6 +8,7 @@ import AddCategoryModal from '../components/AddCategoryModal';
 import EditCategoryModal from '../components/EditCategoryModal';
 import ConfirmModal from '../components/ConfirmModal';
 import Toast from '../components/Toast';
+import BookmarkDetailModal from '../components/BookmarkDetailModal';
 import { BookmarkSkeletonGrid } from '../components/BookmarkSkeleton';
 
 function Dashboard() {
@@ -21,10 +22,12 @@ function Dashboard() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showEditCategoryModal, setShowEditCategoryModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [editingBookmark, setEditingBookmark] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
   const [deletingBookmarkId, setDeletingBookmarkId] = useState(null);
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
+  const [selectedBookmark, setSelectedBookmark] = useState(null);
   const [confirmModalType, setConfirmModalType] = useState('bookmark'); // 'bookmark' 또는 'category'
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const navigate = useNavigate();
@@ -126,6 +129,11 @@ function Dashboard() {
   const handleEditCategory = (category) => {
     setEditingCategory(category);
     setShowEditCategoryModal(true);
+  };
+
+  const handleViewDetail = (bookmark) => {
+    setSelectedBookmark(bookmark);
+    setShowDetailModal(true);
   };
 
   const filteredBookmarks = selectedCategory
@@ -297,6 +305,7 @@ function Dashboard() {
                     bookmark={bookmark}
                     onDelete={handleDeleteBookmark}
                     onEdit={handleEditBookmark}
+                    onViewDetail={handleViewDetail}
                   />
                 ))}
               </div>
@@ -378,6 +387,16 @@ function Dashboard() {
         type={toast.type}
         isVisible={toast.isVisible}
         onClose={() => setToast({ ...toast, isVisible: false })}
+      />
+
+      {/* Bookmark Detail Modal */}
+      <BookmarkDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false);
+          setSelectedBookmark(null);
+        }}
+        bookmark={selectedBookmark}
       />
     </div>
   );

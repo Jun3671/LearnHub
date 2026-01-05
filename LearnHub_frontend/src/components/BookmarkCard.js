@@ -1,6 +1,6 @@
 import React from 'react';
 
-function BookmarkCard({ bookmark, onDelete, onEdit }) {
+function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail }) {
   const getHostname = (url) => {
     try {
       return new URL(url).hostname.replace('www.', '');
@@ -22,7 +22,10 @@ function BookmarkCard({ bookmark, onDelete, onEdit }) {
     <div className="group bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
       {/* Thumbnail */}
       {bookmark.s3ThumbnailUrl && (
-        <div className="h-48 w-full bg-gray-100 overflow-hidden">
+        <div
+          className="h-48 w-full bg-gray-100 overflow-hidden cursor-pointer"
+          onClick={() => onViewDetail(bookmark)}
+        >
           <img
             src={bookmark.s3ThumbnailUrl}
             alt={bookmark.title}
@@ -47,13 +50,22 @@ function BookmarkCard({ bookmark, onDelete, onEdit }) {
         </div>
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+        <h3
+          className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors cursor-pointer"
+          onClick={() => onViewDetail(bookmark)}
+        >
           {bookmark.title || 'Untitled'}
         </h3>
 
         {/* Description */}
         {bookmark.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">{bookmark.description}</p>
+          <p
+            className="text-sm text-gray-600 line-clamp-3 mb-3 cursor-pointer hover:text-gray-900 transition-colors"
+            onClick={() => onViewDetail(bookmark)}
+            title="클릭하여 전체 내용 보기"
+          >
+            {bookmark.description}
+          </p>
         )}
 
         {/* Tags */}
