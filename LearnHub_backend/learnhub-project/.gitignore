@@ -38,3 +38,10 @@ out/
 
 ### Local Development Configuration (contains sensitive data) ###
 src/main/resources/application-dev.properties
+
+### macOS ###
+.DS_Store
+**/.DS_Store
+
+### Windows ###
+Thumbs.db
