@@ -38,6 +38,8 @@ out/
 
 ### Local Development Configuration (contains sensitive data) ###
 src/main/resources/application-dev.properties
+.env
+.env.local
 
 ### macOS ###
 .DS_Store
