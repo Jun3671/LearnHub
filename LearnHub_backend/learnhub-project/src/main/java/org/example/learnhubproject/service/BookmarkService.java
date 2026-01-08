@@ -2,8 +2,10 @@ package org.example.learnhubproject.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.learnhubproject.entity.*;
+import org.example.learnhubproject.exception.ResourceNotFoundException;
 import org.example.learnhubproject.repository.BookmarkRepository;
 import org.example.learnhubproject.repository.BookmarkTagRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,15 @@ public class BookmarkService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final TagService tagService;
+
+    /**
+     * 북마크 소유권 검증
+     */
+    private void validateOwnership(Bookmark bookmark, Long userId) {
+        if (!bookmark.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("접근 권한이 없습니다");
+        }
+    }
 
     @Transactional
     public Bookmark create(Long userId, Long categoryId, String url, String title,
@@ -55,12 +66,21 @@ public class BookmarkService {
     }
 
     public Bookmark findById(Long id) {
-        return bookmarkRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("북마크를 찾을 수 없습니다: " + id));
+        return bookmarkRepository.findByIdWithTags(id)
+                .orElseThrow(() -> new ResourceNotFoundException("북마크", "id", id));
+    }
+
+    /**
+     * 북마크 조회 (권한 검증 포함)
+     */
+    public Bookmark findByIdWithAuth(Long id, Long userId) {
+        Bookmark bookmark = findById(id);
+        validateOwnership(bookmark, userId);
+        return bookmark;
     }
 
     public List<Bookmark> findByUserId(Long userId) {
-        return bookmarkRepository.findByUserId(userId);
+        return bookmarkRepository.findByUserIdWithTags(userId);
     }
 
     public List<Bookmark> findByCategoryId(Long categoryId) {
@@ -68,11 +88,16 @@ public class BookmarkService {
     }
 
     public List<Bookmark> findByUserIdAndCategoryId(Long userId, Long categoryId) {
-        return bookmarkRepository.findByUserIdAndCategoryId(userId, categoryId);
+        return bookmarkRepository.findByUserIdAndCategoryIdWithTags(userId, categoryId);
     }
 
     public List<Bookmark> searchByKeyword(Long userId, String keyword) {
-        return bookmarkRepository.searchByKeyword(userId, keyword);
+        // SQL 특수문자 이스케이프 처리
+        String escapedKeyword = keyword
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+        return bookmarkRepository.searchByKeywordWithTags(userId, escapedKeyword);
     }
 
     public List<Bookmark> findByTagId(Long userId, Long tagId) {
@@ -83,8 +108,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public Bookmark update(Long id, String url, String title, String description, String thumbnailUrl, Long categoryId) {
+    public Bookmark update(Long id, Long userId, String url, String title, String description, String thumbnailUrl, Long categoryId) {
         Bookmark bookmark = findById(id);
+        validateOwnership(bookmark, userId);
 
         if (url != null) bookmark.setUrl(url);
         if (title != null) bookmark.setTitle(title);
@@ -92,6 +118,8 @@ public class BookmarkService {
         if (thumbnailUrl != null) bookmark.setS3ThumbnailUrl(thumbnailUrl);
         if (categoryId != null) {
             Category category = categoryService.findById(categoryId);
+            // 카테고리 소유권도 검증
+            categoryService.validateOwnership(category, userId);
             bookmark.setCategory(category);
         }
 
@@ -99,9 +127,17 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void addTag(Long bookmarkId, String tagName) {
+    public void addTag(Long bookmarkId, Long userId, String tagName) {
         Bookmark bookmark = findById(bookmarkId);
+        validateOwnership(bookmark, userId);
+
         Tag tag = tagService.findOrCreate(tagName);
+
+        // 중복 태그 체크
+        boolean exists = bookmarkTagRepository.existsByBookmarkIdAndTagId(bookmarkId, tag.getId());
+        if (exists) {
+            throw new IllegalArgumentException("이미 추가된 태그입니다");
+        }
 
         BookmarkTag bookmarkTag = BookmarkTag.builder()
                 .bookmark(bookmark)
@@ -112,13 +148,16 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void removeTag(Long bookmarkId, Long tagId) {
+    public void removeTag(Long bookmarkId, Long userId, Long tagId) {
+        Bookmark bookmark = findById(bookmarkId);
+        validateOwnership(bookmark, userId);
         bookmarkTagRepository.deleteByBookmarkIdAndTagId(bookmarkId, tagId);
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long userId) {
         Bookmark bookmark = findById(id);
+        validateOwnership(bookmark, userId);
         bookmarkRepository.delete(bookmark);
     }
 }
