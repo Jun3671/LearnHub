@@ -48,14 +48,8 @@ export const bookmarkAPI = {
     return api.post(`/bookmarks?${params.toString()}`);
   },
   update: (id, data) => {
-    const params = new URLSearchParams();
-    if (data.url) params.append('url', data.url);
-    if (data.title) params.append('title', data.title);
-    if (data.description) params.append('description', data.description);
-    if (data.thumbnailUrl) params.append('thumbnailUrl', data.thumbnailUrl);
-    if (data.categoryId) params.append('categoryId', data.categoryId);
-    if (data.reanalyze) params.append('reanalyze', data.reanalyze);
-    return api.put(`/bookmarks/${id}?${params.toString()}`);
+    // JSON body 방식으로 전송
+    return api.put(`/bookmarks/${id}`, data);
   },
   delete: (id) => api.delete(`/bookmarks/${id}`),
   search: (keyword) => api.get(`/bookmarks/search?keyword=${encodeURIComponent(keyword)}`),
