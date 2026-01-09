@@ -2,7 +2,10 @@ package org.example.learnhubproject.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.example.learnhubproject.dto.CategoryRequest;
 import org.example.learnhubproject.entity.Category;
 import org.example.learnhubproject.entity.User;
 import org.example.learnhubproject.service.CategoryService;
@@ -13,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -22,13 +26,57 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     private final UserService userService;
+    private final Validator validator;
 
     @PostMapping
-    @Operation(summary = "카테고리 생성", description = "새로운 카테고리를 생성합니다")
+    @Operation(summary = "카테고리 생성", description = "새로운 카테고리를 생성합니다 (JSON 또는 Query Parameters)")
     public ResponseEntity<Category> createCategory(
             @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody(required = false) CategoryRequest requestBody,
+            @RequestParam(required = false) String name) {
+
+        User user = userService.findByEmail(userDetails.getUsername());
+
+        // Request Body가 있으면 JSON 방식, 없으면 Query Parameters 방식
+        CategoryRequest request;
+        if (requestBody != null && requestBody.getName() != null) {
+            request = requestBody;
+        } else {
+            request = CategoryRequest.builder()
+                    .name(name)
+                    .build();
+
+            var violations = validator.validate(request);
+            if (!violations.isEmpty()) {
+                String errorMessage = violations.stream()
+                        .map(v -> v.getMessage())
+                        .collect(Collectors.joining(", "));
+                throw new IllegalArgumentException(errorMessage);
+            }
+        }
+
+        Category category = categoryService.create(user.getId(), request.getName());
+        return ResponseEntity.ok(category);
+    }
+
+    @PostMapping("/form")
+    @Operation(summary = "카테고리 생성 (Form)", description = "새로운 카테고리를 생성합니다 (Query Parameters 방식 - 기존 호환성)")
+    public ResponseEntity<Category> createCategoryForm(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam String name) {
-        // JWT에서 추출한 email(username)로 User 조회
+
+        CategoryRequest request = CategoryRequest.builder()
+                .name(name)
+                .build();
+
+        var violations = validator.validate(request);
+        if (!violations.isEmpty()) {
+            String errorMessage = violations.stream()
+                    .map(v -> v.getMessage())
+                    .collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(errorMessage);
+        }
+
         User user = userService.findByEmail(userDetails.getUsername());
         Category category = categoryService.create(user.getId(), name);
         return ResponseEntity.ok(category);
@@ -36,8 +84,11 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     @Operation(summary = "카테고리 조회", description = "ID로 카테고리를 조회합니다")
-    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
-        Category category = categoryService.findById(id);
+    public ResponseEntity<Category> getCategory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        Category category = categoryService.findByIdWithAuth(id, user.getId());
         return ResponseEntity.ok(category);
     }
 
@@ -51,26 +102,24 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "사용자별 카테고리 조회", description = "특정 사용자의 모든 카테고리를 조회합니다")
-    public ResponseEntity<List<Category>> getCategoriesByUser(@PathVariable Long userId) {
-        List<Category> categories = categoryService.findByUserId(userId);
-        return ResponseEntity.ok(categories);
-    }
-
     @PutMapping("/{id}")
     @Operation(summary = "카테고리 수정", description = "카테고리명을 수정합니다")
     public ResponseEntity<Category> updateCategory(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
-            @RequestParam String name) {
-        Category category = categoryService.update(id, name);
+            @Valid @RequestBody CategoryRequest request) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        Category category = categoryService.update(id, user.getId(), request.getName());
         return ResponseEntity.ok(category);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "카테고리 삭제", description = "카테고리를 삭제합니다")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        categoryService.delete(id);
+    public ResponseEntity<Void> deleteCategory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        categoryService.delete(id, user.getId());
         return ResponseEntity.noContent().build();
     }
 }
