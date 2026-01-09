@@ -18,5 +18,7 @@ public interface BookmarkTagRepository extends JpaRepository<BookmarkTag, Long> 
     @Query("SELECT bt FROM BookmarkTag bt WHERE bt.bookmark.user.id = :userId AND bt.tag.id = :tagId")
     List<BookmarkTag> findByUserIdAndTagId(@Param("userId") Long userId, @Param("tagId") Long tagId);
 
+    boolean existsByBookmarkIdAndTagId(Long bookmarkId, Long tagId);
+
     void deleteByBookmarkIdAndTagId(Long bookmarkId, Long tagId);
 }

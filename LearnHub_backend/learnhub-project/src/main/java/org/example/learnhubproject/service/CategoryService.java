@@ -3,7 +3,9 @@ package org.example.learnhubproject.service;
 import lombok.RequiredArgsConstructor;
 import org.example.learnhubproject.entity.Category;
 import org.example.learnhubproject.entity.User;
+import org.example.learnhubproject.exception.ResourceNotFoundException;
 import org.example.learnhubproject.repository.CategoryRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,15 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserService userService;
+
+    /**
+     * 카테고리 소유권 검증
+     */
+    public void validateOwnership(Category category, Long userId) {
+        if (!category.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("접근 권한이 없습니다");
+        }
+    }
 
     @Transactional
     public Category create(Long userId, String name) {
@@ -35,7 +46,16 @@ public class CategoryService {
 
     public Category findById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("카테고리", "id", id));
+    }
+
+    /**
+     * 카테고리 조회 (권한 검증 포함)
+     */
+    public Category findByIdWithAuth(Long id, Long userId) {
+        Category category = findById(id);
+        validateOwnership(category, userId);
+        return category;
     }
 
     public List<Category> findByUserId(Long userId) {
@@ -43,8 +63,9 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category update(Long id, String name) {
+    public Category update(Long id, Long userId, String name) {
         Category category = findById(id);
+        validateOwnership(category, userId);
 
         if (categoryRepository.existsByUserIdAndName(category.getUser().getId(), name)) {
             throw new IllegalArgumentException("이미 존재하는 카테고리명입니다: " + name);
@@ -55,8 +76,9 @@ public class CategoryService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long userId) {
         Category category = findById(id);
+        validateOwnership(category, userId);
         categoryRepository.delete(category);
     }
 }
