@@ -19,39 +19,43 @@ function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail }) {
   };
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
+    <div className="group relative bg-white rounded-lg border border-neutral-200/60 hover:border-primary-200 hover:shadow-card-hover transition-all duration-300 overflow-hidden">
       {/* Thumbnail */}
       {bookmark.s3ThumbnailUrl && (
         <div
-          className="h-48 w-full bg-gray-100 overflow-hidden cursor-pointer"
+          className="relative h-48 w-full bg-neutral-100 overflow-hidden cursor-pointer"
           onClick={() => onViewDetail(bookmark)}
         >
           <img
             src={bookmark.s3ThumbnailUrl}
             alt={bookmark.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          {/* Gradient overlay on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
       )}
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-4">
         {/* Header with Favicon and URL */}
         <div className="flex items-center gap-2 mb-2">
           {getFavicon(bookmark.url) && (
             <img
               src={getFavicon(bookmark.url)}
               alt=""
-              className="w-4 h-4"
+              className="w-4 h-4 opacity-60"
               onError={(e) => (e.target.style.display = 'none')}
             />
           )}
-          <span className="text-xs text-gray-500 truncate">{getHostname(bookmark.url)}</span>
+          <span className="text-xs text-neutral-500 font-medium tracking-wide truncate">
+            {getHostname(bookmark.url)}
+          </span>
         </div>
 
         {/* Title */}
         <h3
-          className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors cursor-pointer"
+          className="font-semibold text-neutral-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors duration-200 cursor-pointer leading-snug"
           onClick={() => onViewDetail(bookmark)}
         >
           {bookmark.title || 'Untitled'}
@@ -60,7 +64,7 @@ function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail }) {
         {/* Description */}
         {bookmark.description && (
           <p
-            className="text-sm text-gray-600 line-clamp-3 mb-3 cursor-pointer hover:text-gray-900 transition-colors"
+            className="text-sm text-neutral-600 leading-relaxed line-clamp-3 mb-3 cursor-pointer hover:text-neutral-800 transition-colors"
             onClick={() => onViewDetail(bookmark)}
             title="클릭하여 전체 내용 보기"
           >
@@ -74,45 +78,70 @@ function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail }) {
             {bookmark.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag.id}
-                className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-md"
+                className="text-xs px-2.5 py-1 bg-neutral-100 text-neutral-700 rounded-full font-medium hover:bg-primary-50 hover:text-primary-700 transition-colors cursor-pointer"
               >
                 {tag.name}
               </span>
             ))}
             {bookmark.tags.length > 3 && (
-              <span className="text-xs px-2 py-1 text-gray-500">+{bookmark.tags.length - 3}</span>
+              <span className="text-xs px-2.5 py-1 text-neutral-400 font-medium">
+                +{bookmark.tags.length - 3}
+              </span>
             )}
           </div>
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
           <a
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+            className="group/link text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 transition-colors"
           >
-            Visit →
+            <span>Visit</span>
+            <svg
+              className="w-4 h-4 transform group-hover/link:translate-x-0.5 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
           </a>
 
-          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button
               onClick={() => onEdit(bookmark)}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 hover:bg-primary-50 text-neutral-600 hover:text-primary-600 rounded-md transition-all duration-200 hover:scale-110 active:scale-95"
               title="Edit"
             >
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
             </button>
             <button
               onClick={() => onDelete(bookmark.id)}
-              className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-1.5 hover:bg-rose/10 text-neutral-600 hover:text-rose rounded-md transition-all duration-200 hover:scale-110 active:scale-95"
               title="Delete"
             >
-              <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
           </div>
