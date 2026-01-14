@@ -111,16 +111,16 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
   if (!isOpen || !bookmark) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-xl shadow-modal max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-2xl font-semibold text-gray-900">북마크 수정</h2>
+        <div className="sticky top-0 bg-white border-b border-neutral-200/60 px-6 py-4 flex items-center justify-between rounded-t-xl">
+          <h2 className="text-xl font-semibold text-neutral-900">북마크 수정</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-lg transition-all active:scale-95"
           >
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -129,15 +129,18 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {error}
+            <div className="p-4 bg-rose/10 border border-rose/20 rounded-lg text-rose text-sm flex items-start gap-3">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
           {/* URL */}
           <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-              URL <span className="text-red-500">*</span>
+            <label htmlFor="url" className="block text-sm font-semibold text-neutral-700 mb-2 tracking-wide">
+              URL <span className="text-rose">*</span>
             </label>
             <div className="flex gap-2">
               <input
@@ -148,13 +151,13 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
                 onChange={handleChange}
                 required
                 placeholder="https://example.com/article"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+                className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-white hover:border-neutral-400"
               />
               <button
                 type="button"
                 onClick={handleAnalyzeUrl}
                 disabled={analyzing || !formData.url}
-                className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                className="px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-lg font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap active:scale-98 ring-2 ring-indigo-500/20"
               >
                 {analyzing ? (
                   <>
@@ -174,13 +177,13 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">AI가 자동으로 제목, 설명, 태그를 추출합니다</p>
+            <p className="text-xs text-neutral-500 mt-1">AI가 자동으로 제목, 설명, 태그를 추출합니다</p>
           </div>
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-              제목 <span className="text-red-500">*</span>
+            <label htmlFor="title" className="block text-sm font-semibold text-neutral-700 mb-2 tracking-wide">
+              제목 <span className="text-rose">*</span>
             </label>
             <input
               id="title"
@@ -190,13 +193,13 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
               onChange={handleChange}
               required
               placeholder="북마크 제목을 입력하세요"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+              className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-white hover:border-neutral-400"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="description" className="block text-sm font-semibold text-neutral-700 mb-2 tracking-wide">
               설명
             </label>
             <textarea
@@ -206,14 +209,14 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
               onChange={handleChange}
               rows="4"
               placeholder="북마크에 대한 간단한 설명을 입력하세요 (선택사항)"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none resize-none"
+              className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-white hover:border-neutral-400 resize-none"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">
-              카테고리 <span className="text-red-500">*</span>
+            <label htmlFor="categoryId" className="block text-sm font-semibold text-neutral-700 mb-2 tracking-wide">
+              카테고리 <span className="text-rose">*</span>
             </label>
             <select
               id="categoryId"
@@ -221,7 +224,7 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
               value={formData.categoryId}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+              className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-white hover:border-neutral-400"
             >
               <option value="">카테고리를 선택하세요</option>
               {categories.map((category) => (
@@ -234,7 +237,7 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
 
           {/* Tags */}
           <div>
-            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="tags" className="block text-sm font-semibold text-neutral-700 mb-2 tracking-wide">
               태그
             </label>
             <input
@@ -244,9 +247,9 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
               value={formData.tags}
               onChange={handleChange}
               placeholder="React, Spring, AWS (쉼표로 구분)"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+              className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-white hover:border-neutral-400"
             />
-            <p className="text-xs text-gray-500 mt-1">쉼표(,)로 구분하여 여러 태그를 입력할 수 있습니다</p>
+            <p className="text-xs text-neutral-500 mt-1">쉼표(,)로 구분하여 여러 태그를 입력할 수 있습니다</p>
           </div>
 
           {/* Actions */}
@@ -254,14 +257,14 @@ function EditBookmarkModal({ isOpen, onClose, onSuccess, bookmark }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 font-semibold transition-all active:scale-98"
             >
               취소
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
             >
               {loading ? '수정 중...' : '수정 완료'}
             </button>
