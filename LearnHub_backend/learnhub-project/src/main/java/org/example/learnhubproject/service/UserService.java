@@ -1,7 +1,9 @@
 package org.example.learnhubproject.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.learnhubproject.entity.Category;
 import org.example.learnhubproject.entity.User;
+import org.example.learnhubproject.repository.CategoryRepository;
 import org.example.learnhubproject.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     public User register(String email, String password, String role) {
@@ -29,7 +32,17 @@ public class UserService {
                 .role(role != null ? role : "USER")
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // 사용자 생성 시 기본 카테고리 자동 생성
+        Category defaultCategory = Category.builder()
+                .name("미분류")
+                .isDefault(true)
+                .user(savedUser)
+                .build();
+        categoryRepository.save(defaultCategory);
+
+        return savedUser;
     }
 
     public User findById(Long id) {
