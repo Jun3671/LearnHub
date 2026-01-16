@@ -141,33 +141,33 @@ function Dashboard() {
     : bookmarks;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100/50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-neutral-0/80 backdrop-blur-lg border-b border-neutral-200/60 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">LearnHub</h1>
+              <h1 className="text-xl font-bold text-neutral-900 tracking-tight">LearnHub</h1>
             </div>
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl mx-8">
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
                   placeholder="Search bookmarks..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-2 pl-10 bg-neutral-100/50 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:bg-white focus:border-primary-500 outline-none transition-all"
                 />
                 <svg
-                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+                  className="absolute left-3 top-2.5 w-5 h-5 text-neutral-400 group-focus-within:text-primary-500 transition-colors"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -181,16 +181,16 @@ function Dashboard() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition-all active:scale-98"
               >
                 + Add Bookmark
               </button>
               <button
                 onClick={handleLogout}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 rounded-lg transition-all active:scale-95"
                 title="Logout"
               >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </button>
@@ -203,15 +203,15 @@ function Dashboard() {
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 sticky top-24">
+            <div className="bg-white/70 backdrop-blur-sm rounded-lg border border-neutral-200/60 p-4 sticky top-24 shadow-card">
               <div className="flex items-center justify-between mb-3 px-2">
-                <h2 className="text-sm font-semibold text-gray-900">Categories</h2>
+                <h2 className="text-sm font-semibold text-neutral-900 tracking-wide">Categories</h2>
                 <button
                   onClick={() => setShowCategoryModal(true)}
-                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1 hover:bg-neutral-100 rounded-md transition-all hover:scale-110 active:scale-95"
                   title="Add Category"
                 >
-                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
@@ -219,22 +219,22 @@ function Dashboard() {
               <nav className="space-y-1">
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     selectedCategory === null
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-primary-50/80 text-primary-600 border-l-2 border-primary-600 pl-2.5'
+                      : 'text-neutral-700 hover:bg-neutral-50'
                   }`}
                 >
                   All Bookmarks
-                  <span className="float-right text-gray-500">{bookmarks.length}</span>
+                  <span className="float-right text-neutral-500 text-xs font-medium">{bookmarks.length}</span>
                 </button>
                 {categories.map((category) => (
                   <div
                     key={category.id}
-                    className={`group relative px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`group relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       selectedCategory === category.id
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-primary-50/80 text-primary-600 border-l-2 border-primary-600 pl-2.5'
+                        : 'text-neutral-700 hover:bg-neutral-50'
                     }`}
                   >
                     <button
@@ -242,36 +242,39 @@ function Dashboard() {
                       className="w-full text-left"
                     >
                       {category.name}
-                      <span className="float-right text-gray-500 mr-12">
+                      <span className="float-right text-neutral-500 text-xs font-medium mr-12">
                         {bookmarks.filter((b) => b.category?.id === category.id).length}
                       </span>
                     </button>
                     {/* 수정 및 삭제 버튼 - hover 시 표시 */}
-                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 flex gap-1">
+                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEditCategory(category);
                         }}
-                        className="p-1 hover:bg-blue-100 rounded transition-all"
+                        className="p-1 hover:bg-primary-50 text-neutral-600 hover:text-primary-600 rounded transition-all hover:scale-110 active:scale-95"
                         title="Edit Category"
                       >
-                        <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteCategory(category.id);
-                        }}
-                        className="p-1 hover:bg-red-100 rounded transition-all"
-                        title="Delete Category"
-                      >
-                        <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      {/* 기본 카테고리는 삭제 버튼 숨김 */}
+                      {!category.isDefault && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCategory(category.id);
+                          }}
+                          className="p-1 hover:bg-rose/10 text-neutral-600 hover:text-rose rounded transition-all hover:scale-110 active:scale-95"
+                          title="Delete Category"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -284,21 +287,23 @@ function Dashboard() {
             {loading ? (
               <BookmarkSkeletonGrid count={6} />
             ) : filteredBookmarks.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No bookmarks yet</h3>
-                <p className="text-gray-500 mb-6">Start by adding your first learning resource</p>
+              <div className="text-center py-16 px-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-neutral-100 rounded-full mb-4 animate-pulse-subtle">
+                  <svg className="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-neutral-900 mb-2">No bookmarks yet</h3>
+                <p className="text-neutral-600 mb-6 max-w-sm mx-auto">Start building your learning library by adding your first resource</p>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                  className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition-all active:scale-98"
                 >
                   Add Your First Bookmark
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredBookmarks.map((bookmark) => (
                   <BookmarkCard
                     key={bookmark.id}
