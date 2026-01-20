@@ -13,8 +13,6 @@ function AddCategoryModal({ isOpen, onClose, onSuccess }) {
 
     try {
       await categoryAPI.create(categoryName);
-
-      // 성공 시 폼 초기화 및 모달 닫기
       setCategoryName('');
       onSuccess();
       onClose();
@@ -25,19 +23,30 @@ function AddCategoryModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
+  const handleClose = () => {
+    setCategoryName('');
+    setError('');
+    onClose();
+  };
+
   if (!isOpen) return null;
 
+  const suggestedCategories = ['Frontend', 'Backend', 'DevOps', 'Database', 'Mobile', 'AI/ML'];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in overflow-hidden">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-xl font-semibold text-gray-900">새 카테고리 추가</h2>
+        <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white">새 카테고리 추가</h2>
+            <p className="text-primary-100 text-sm">북마크를 체계적으로 정리하세요</p>
+          </div>
           <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={handleClose}
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -46,43 +55,85 @@ function AddCategoryModal({ isOpen, onClose, onSuccess }) {
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {error}
+            <div className="p-4 bg-rose/10 border border-rose/20 rounded-xl text-rose text-sm flex items-start gap-3">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
           {/* Category Name */}
           <div>
-            <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700 mb-2">
-              카테고리 이름 <span className="text-red-500">*</span>
+            <label htmlFor="categoryName" className="block text-sm font-semibold text-neutral-700 mb-2">
+              카테고리 이름 <span className="text-rose">*</span>
             </label>
-            <input
-              id="categoryName"
-              type="text"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-              required
-              placeholder="예: Frontend, Backend, DevOps"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
-              autoFocus
-            />
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+              </div>
+              <input
+                id="categoryName"
+                type="text"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                required
+                placeholder="카테고리 이름을 입력하세요"
+                className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none bg-neutral-50 hover:bg-white"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Suggestions */}
+          <div>
+            <span className="text-xs text-neutral-500">추천:</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {suggestedCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategoryName(cat)}
+                  className="text-xs px-3 py-1.5 bg-neutral-100 text-neutral-600 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              onClick={handleClose}
+              className="flex-1 px-5 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 font-medium transition-all"
             >
               취소
             </button>
             <button
               type="submit"
               disabled={loading || !categoryName.trim()}
-              className="flex-1 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-all shadow-lg shadow-primary-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? '추가 중...' : '추가'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>추가 중...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>추가</span>
+                </>
+              )}
             </button>
           </div>
         </form>

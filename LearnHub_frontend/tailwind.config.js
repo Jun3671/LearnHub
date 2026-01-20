@@ -6,33 +6,33 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Modern Neutral Palette (Notion-inspired)
+        // Modern Neutral Palette
         neutral: {
           0: '#FFFFFF',
-          50: '#FAFAFA',
-          100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
-          950: '#0A0A0A',
+          50: '#F8FAF9',
+          100: '#F1F5F3',
+          200: '#E3E9E6',
+          300: '#CDD5D1',
+          400: '#9CA8A2',
+          500: '#6B7A72',
+          600: '#4A5650',
+          700: '#3A433E',
+          800: '#252B28',
+          900: '#171A18',
+          950: '#0A0C0B',
         },
-        // Modern Purple-Blue Primary
+        // Modern Green Primary (NewCodes-inspired)
         primary: {
-          50: '#F0F4FF',
-          100: '#E0EAFF',
-          200: '#C7D7FE',
-          300: '#A4BCFD',
-          400: '#8098F9',
-          500: '#6172F3',
-          600: '#4E5CE6',
-          700: '#3F48CC',
-          800: '#353FA4',
-          900: '#2F3881',
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          200: '#A7F3D0',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         // Accent Colors
         purple: '#7C3AED',
@@ -40,6 +40,7 @@ module.exports = {
         amber: '#F59E0B',
         rose: '#F43F5E',
         sky: '#0EA5E9',
+        blue: '#3B82F6',
       },
       fontFamily: {
         sans: ['Inter var', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
