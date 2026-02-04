@@ -24,18 +24,26 @@ public class TagController {
         return ResponseEntity.ok(tag);
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "태그 조회", description = "ID로 태그를 조회합니다")
-    public ResponseEntity<org.example.learnhubproject.entity.Tag> getTag(@PathVariable Long id) {
-        org.example.learnhubproject.entity.Tag tag = tagService.findById(id);
-        return ResponseEntity.ok(tag);
-    }
-
     @GetMapping
     @Operation(summary = "전체 태그 조회", description = "모든 태그를 조회합니다")
     public ResponseEntity<List<org.example.learnhubproject.entity.Tag>> getAllTags() {
         List<org.example.learnhubproject.entity.Tag> tags = tagService.findAll();
         return ResponseEntity.ok(tags);
+    }
+
+    @GetMapping("/popular")
+    @Operation(summary = "인기 태그 조회", description = "사용 빈도가 높은 태그를 조회합니다 (최대 20개)")
+    public ResponseEntity<List<org.example.learnhubproject.entity.Tag>> getPopularTags(
+            @RequestParam(defaultValue = "20") int limit) {
+        List<org.example.learnhubproject.entity.Tag> tags = tagService.findTopPopularTags(limit);
+        return ResponseEntity.ok(tags);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "태그 조회", description = "ID로 태그를 조회합니다")
+    public ResponseEntity<org.example.learnhubproject.entity.Tag> getTag(@PathVariable Long id) {
+        org.example.learnhubproject.entity.Tag tag = tagService.findById(id);
+        return ResponseEntity.ok(tag);
     }
 
     @GetMapping("/name")
