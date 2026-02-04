@@ -103,12 +103,33 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "카테고리 수정", description = "카테고리명을 수정합니다")
+    @Operation(summary = "카테고리 수정", description = "카테고리명을 수정합니다 (JSON 또는 Query Parameters)")
     public ResponseEntity<Category> updateCategory(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
-            @Valid @RequestBody CategoryRequest request) {
+            @RequestBody(required = false) CategoryRequest requestBody,
+            @RequestParam(required = false) String name) {
+
         User user = userService.findByEmail(userDetails.getUsername());
+
+        // Request Body가 있으면 JSON 방식, 없으면 Query Parameters 방식
+        CategoryRequest request;
+        if (requestBody != null && requestBody.getName() != null) {
+            request = requestBody;
+        } else {
+            request = CategoryRequest.builder()
+                    .name(name)
+                    .build();
+
+            var violations = validator.validate(request);
+            if (!violations.isEmpty()) {
+                String errorMessage = violations.stream()
+                        .map(v -> v.getMessage())
+                        .collect(Collectors.joining(", "));
+                throw new IllegalArgumentException(errorMessage);
+            }
+        }
+
         Category category = categoryService.update(id, user.getId(), request.getName());
         return ResponseEntity.ok(category);
     }
