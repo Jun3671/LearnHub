@@ -24,6 +24,10 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "is_default", nullable = false)
+    @Builder.Default
+    private Boolean isDefault = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
