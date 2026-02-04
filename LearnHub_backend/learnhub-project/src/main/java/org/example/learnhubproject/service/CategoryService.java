@@ -1,9 +1,11 @@
 package org.example.learnhubproject.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.learnhubproject.entity.Bookmark;
 import org.example.learnhubproject.entity.Category;
 import org.example.learnhubproject.entity.User;
 import org.example.learnhubproject.exception.ResourceNotFoundException;
+import org.example.learnhubproject.repository.BookmarkRepository;
 import org.example.learnhubproject.repository.CategoryRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final UserService userService;
 
     /**
@@ -79,6 +82,32 @@ public class CategoryService {
     public void delete(Long id, Long userId) {
         Category category = findById(id);
         validateOwnership(category, userId);
+
+        // 기본 카테고리는 삭제 불가
+        if (Boolean.TRUE.equals(category.getIsDefault())) {
+            throw new IllegalArgumentException("기본 카테고리는 삭제할 수 없습니다");
+        }
+
+        // 카테고리에 속한 북마크를 기본 카테고리로 이동 (없으면 자동 생성)
+        Category defaultCategory = categoryRepository
+                .findByUserIdAndIsDefault(userId, true)
+                .orElseGet(() -> {
+                    // 기본 카테고리가 없으면 자동 생성
+                    User user = userService.findById(userId);
+                    Category newDefault = Category.builder()
+                            .name("미분류")
+                            .isDefault(true)
+                            .user(user)
+                            .build();
+                    return categoryRepository.save(newDefault);
+                });
+
+        List<Bookmark> bookmarks = bookmarkRepository.findByCategoryId(id);
+        for (Bookmark bookmark : bookmarks) {
+            bookmark.setCategory(defaultCategory);
+        }
+
+        // 카테고리 삭제
         categoryRepository.delete(category);
     }
 }
