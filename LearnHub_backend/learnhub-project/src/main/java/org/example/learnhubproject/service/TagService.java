@@ -53,6 +53,20 @@ public class TagService {
         return tagRepository.findAll();
     }
 
+    /**
+     * 인기 태그 조회 (사용 빈도수 기준 내림차순)
+     */
+    public List<Tag> findPopularTags() {
+        return tagRepository.findPopularTags();
+    }
+
+    /**
+     * 인기 태그 상위 N개 조회
+     */
+    public List<Tag> findTopPopularTags(int limit) {
+        return tagRepository.findTopPopularTags(limit);
+    }
+
     @Transactional
     public void delete(Long id) {
         Tag tag = findById(id);
