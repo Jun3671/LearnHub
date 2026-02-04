@@ -125,11 +125,13 @@ public class BookmarkController {
     }
 
     @GetMapping
-    @Operation(summary = "내 북마크 조회", description = "현재 로그인한 사용자의 모든 북마크를 조회합니다")
-    public ResponseEntity<List<Bookmark>> getMyBookmarks(@AuthenticationPrincipal UserDetails userDetails) {
+    @Operation(summary = "내 북마크 조회", description = "현재 로그인한 사용자의 모든 북마크를 조회합니다. sort 파라미터로 정렬 가능 (latest: 최신순, oldest: 오래된순, title: 제목순)")
+    public ResponseEntity<List<Bookmark>> getMyBookmarks(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false, defaultValue = "latest") String sort) {
         // JWT에서 추출한 email(username)로 User 조회
         User user = userService.findByEmail(userDetails.getUsername());
-        List<Bookmark> bookmarks = bookmarkService.findByUserId(user.getId());
+        List<Bookmark> bookmarks = bookmarkService.findByUserIdSorted(user.getId(), sort);
         return ResponseEntity.ok(bookmarks);
     }
 
