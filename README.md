@@ -75,29 +75,7 @@
 
 ---
 
-## 🏗 아키텍처
 
-### System Architecture
-```
-Frontend (React)
-    ↓ HTTP + JWT
-Backend (Spring Boot)
-    ↓ JPA
-MySQL
-    ↑
-Google Gemini API (AI)
-```
-
-### Database ERD
-```
-User (1) ──────────────────────── (n) Category
-  │ (1)                              │ (n)
-  │                                  └─ Bookmarks
-  │                                      │ (n)
-  └──────────── (n) Bookmark ────────────┼──────────── (n) Tag
-                                          │
-                                          └─── (n) BookmarkTag (junction)
-```
 
 ### Layered Architecture
 ```
@@ -257,7 +235,6 @@ LearnHub/
 │   │   └── services/         # API 호출 (Axios)
 │   └── package.json
 │
-├── PERFORMANCE_IMPROVEMENTS.md   # 성능 개선 상세 문서
 └── README.md
 ```
 
