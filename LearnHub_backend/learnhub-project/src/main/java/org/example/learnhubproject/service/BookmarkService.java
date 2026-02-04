@@ -83,6 +83,19 @@ public class BookmarkService {
         return bookmarkRepository.findByUserIdWithTags(userId);
     }
 
+    /**
+     * 사용자의 북마크 조회 (정렬 옵션 포함)
+     * @param userId 사용자 ID
+     * @param sort 정렬 기준 (latest: 최신순, oldest: 오래된순, title: 제목순)
+     */
+    public List<Bookmark> findByUserIdSorted(Long userId, String sort) {
+        // 유효하지 않은 정렬 옵션은 기본값(latest)으로 처리
+        if (!List.of("latest", "oldest", "title").contains(sort)) {
+            sort = "latest";
+        }
+        return bookmarkRepository.findByUserIdWithTagsSorted(userId, sort);
+    }
+
     public List<Bookmark> findByCategoryId(Long categoryId) {
         return bookmarkRepository.findByCategoryId(categoryId);
     }
@@ -92,6 +105,16 @@ public class BookmarkService {
     }
 
     public List<Bookmark> searchByKeyword(Long userId, String keyword) {
+        // #태그 검색 시 # 제거 (예: #Spring -> Spring)
+        if (keyword.startsWith("#")) {
+            keyword = keyword.substring(1);
+        }
+
+        // 빈 문자열 체크
+        if (keyword.trim().isEmpty()) {
+            return findByUserId(userId);
+        }
+
         // SQL 특수문자 이스케이프 처리
         String escapedKeyword = keyword
                 .replace("\\", "\\\\")
