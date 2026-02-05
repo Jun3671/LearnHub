@@ -20,127 +20,6 @@
 
 ![img.png](img.png)
 
----
-
-## 🚀 핵심 문제 해결 (Performance Optimization)
-
-### 1. N+1 쿼리 문제 해결
-
-#### 문제 상황
-북마크 목록 조회 시 각 북마크의 태그를 Lazy Loading으로 불러오면서 **301번의 쿼리**가 발생했습니다.
-
-```java
-// Before: 북마크 100개 조회 시 301번의 쿼리 발생
-List<Bookmark> findByUserId(Long userId);
-// 1번: 북마크 조회
-// 100번: 각 북마크의 태그 조회 (N+1)
-// 200번: 각 태그 상세 조회 (N+1)
-```
-
-#### 원인 분석
-- JPA의 기본 Lazy Loading 전략으로 인한 추가 쿼리
-- Many-to-Many 관계에서 중간 테이블(BookmarkTag) 조회 오버헤드
-
-#### 해결 방법
-`JOIN FETCH`를 사용한 **Eager Loading 전략**으로 1번의 쿼리로 모든 연관 데이터 조회
-
-```java
-// After: 1번의 쿼리로 모든 데이터 조회
-@Query("SELECT DISTINCT b FROM Bookmark b " +
-       "LEFT JOIN FETCH b.bookmarkTags bt " +
-       "LEFT JOIN FETCH bt.tag " +
-       "LEFT JOIN FETCH b.category " +
-       "WHERE b.user.id = :userId")
-List<Bookmark> findByUserIdWithTags(@Param("userId") Long userId);
-```
-
-#### 성과 (수치)
-| 항목 | Before | After | 개선율 |
-|------|--------|-------|--------|
-| **쿼리 횟수** | 301번 | 1번 | **99.7% ↓** |
-| **응답 시간** | 2,500ms | 120ms | **95.2% ↓** |
-
-**상세 코드**: [BookmarkRepository.java:15-20](./LearnHub_backend/learnhub-project/src/main/java/org/example/learnhubproject/repository/BookmarkRepository.java)
-
----
-
-### 2. 트랜잭션 전략 최적화
-
-#### 문제 상황
-모든 메서드에 `@Transactional`을 적용하면서 읽기 작업에서도 불필요한 flush와 더티 체킹이 발생
-
-#### 해결 방법
-- 클래스 레벨: `@Transactional(readOnly = true)` (읽기 전용 기본 설정)
-- 쓰기 메서드만 `@Transactional` 오버라이드
-
-```java
-@Service
-@Transactional(readOnly = true)  // 기본: 읽기 전용
-public class BookmarkService {
-
-    public Bookmark findById(Long id) { ... }  // readOnly 상속
-
-    @Transactional  // 쓰기 작업만 명시
-    public Bookmark create(...) { ... }
-}
-```
-
-#### 성과
-- Flush 모드 MANUAL 전환 → 불필요한 DB 동기화 방지
-- 더티 체킹 비활성화 → 메모리 사용량 감소
-- DB 레벨 최적화 힌트 제공
-
----
-
-### 3. SQL Injection 방어
-
-#### 문제 상황
-사용자 입력 키워드에 `%`, `_` 같은 SQL 특수문자가 포함될 경우 의도하지 않은 검색 결과 반환
-
-#### 해결 방법
-검색 키워드의 특수문자 이스케이프 처리
-
-```java
-public List<Bookmark> searchByKeyword(Long userId, String keyword) {
-    String escapedKeyword = keyword
-            .replace("\\", "\\\\")
-            .replace("%", "\\%")
-            .replace("_", "\\_");
-    return bookmarkRepository.searchByKeywordWithTags(userId, escapedKeyword);
-}
-```
-
----
-
-### 4. 영속성 컨텍스트 관리
-
-#### 문제 상황
-테스트 환경에서 `getTags()` 호출 시 빈 리스트 반환 (실제 DB에는 데이터 존재)
-
-#### 원인 분석
-`BookmarkTag`가 영속성 컨텍스트에 캐시되어 있어 DB 재조회 없이 이전 상태 반환
-
-#### 해결 방법
-`EntityManager.flush()` + `clear()`로 영속성 컨텍스트 초기화
-
-```java
-@Test
-void testBookmarkTags() {
-    // Given: BookmarkTag 저장
-    bookmarkTagRepository.save(bookmarkTag);
-
-    entityManager.flush();   // DB 동기화
-    entityManager.clear();   // 영속성 컨텍스트 초기화
-
-    // When: 조회
-    Bookmark result = bookmarkRepository.findById(bookmarkId).get();
-
-    // Then: 최신 데이터 반영
-    assertThat(result.getTags()).isNotEmpty();
-}
-```
-
-**상세 문서**: [PERFORMANCE_IMPROVEMENTS.md](./PERFORMANCE_IMPROVEMENTS.md)
 
 ---
 
@@ -196,29 +75,7 @@ void testBookmarkTags() {
 
 ---
 
-## 🏗 아키텍처
 
-### System Architecture
-```
-Frontend (React)
-    ↓ HTTP + JWT
-Backend (Spring Boot)
-    ↓ JPA
-MySQL
-    ↑
-Google Gemini API (AI)
-```
-
-### Database ERD
-```
-User (1) ──────────────────────── (n) Category
-  │ (1)                              │ (n)
-  │                                  └─ Bookmarks
-  │                                      │ (n)
-  └──────────── (n) Bookmark ────────────┼──────────── (n) Tag
-                                          │
-                                          └─── (n) BookmarkTag (junction)
-```
 
 ### Layered Architecture
 ```
@@ -378,7 +235,6 @@ LearnHub/
 │   │   └── services/         # API 호출 (Axios)
 │   └── package.json
 │
-├── PERFORMANCE_IMPROVEMENTS.md   # 성능 개선 상세 문서
 └── README.md
 ```
 
