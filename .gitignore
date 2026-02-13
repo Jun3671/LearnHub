@@ -4,6 +4,8 @@ node_modules/
 target/
 build/
 *.log
+.idea/
+**/.idea/
 
 # Local development configuration (contains passwords)
 **/application-dev.properties
