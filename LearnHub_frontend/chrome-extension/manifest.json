@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "LearnHub Bookmark Saver",
+  "version": "1.0.0",
+  "description": "LearnHub에서 현재 페이지를 빠르게 북마크로 저장하세요",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:8080/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
