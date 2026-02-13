@@ -36,6 +36,15 @@ public class BookmarkCreateRequest {
     @Size(max = 2048, message = "썸네일 URL은 2048자 이하여야 합니다")
     private String thumbnailUrl;
 
+    @Size(max = 2048, message = "이미지 URL은 2048자 이하여야 합니다")
+    private String imageUrl;
+
+    @Size(max = 500, message = "메타 제목은 500자 이하여야 합니다")
+    private String metaTitle;
+
+    @Size(max = 1000, message = "메타 설명은 1000자 이하여야 합니다")
+    private String metaDescription;
+
     @Size(max = 10, message = "태그는 최대 10개까지 추가할 수 있습니다")
     private List<@NotBlank @Size(max = 30, message = "태그는 30자 이하여야 합니다") String> tags;
 }

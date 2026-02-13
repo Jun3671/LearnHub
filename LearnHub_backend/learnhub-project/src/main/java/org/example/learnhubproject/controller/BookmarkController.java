@@ -198,7 +198,9 @@ public class BookmarkController {
                         ? request.getDescription() : analysisResult.getDescription();
 
                 Bookmark bookmark = bookmarkService.update(id, user.getId(), request.getUrl(),
-                        finalTitle, finalDescription, request.getThumbnailUrl(), request.getCategoryId());
+                        finalTitle, finalDescription, request.getThumbnailUrl(),
+                        request.getImageUrl(), request.getMetaTitle(), request.getMetaDescription(),
+                        request.getCategoryId(), request.getReanalyze());
 
                 // AI가 제안한 태그 추가
                 if (analysisResult.getTags() != null && !analysisResult.getTags().isEmpty()) {
@@ -219,7 +221,9 @@ public class BookmarkController {
 
         // 일반 수정
         Bookmark bookmark = bookmarkService.update(id, user.getId(), request.getUrl(),
-                request.getTitle(), request.getDescription(), request.getThumbnailUrl(), request.getCategoryId());
+                request.getTitle(), request.getDescription(), request.getThumbnailUrl(),
+                request.getImageUrl(), request.getMetaTitle(), request.getMetaDescription(),
+                request.getCategoryId(), request.getReanalyze());
 
         // 태그 처리: 기존 태그를 모두 삭제하고 새로운 태그 추가
         if (request.getTags() != null) {

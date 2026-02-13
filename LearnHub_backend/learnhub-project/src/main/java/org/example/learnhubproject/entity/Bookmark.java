@@ -43,6 +43,15 @@ public class Bookmark {
     @Column(name = "s3_thumbnail_url")
     private String s3ThumbnailUrl;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
+    @Column(name = "meta_title", length = 500)
+    private String metaTitle;
+
+    @Column(name = "meta_description", length = 1000)
+    private String metaDescription;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
