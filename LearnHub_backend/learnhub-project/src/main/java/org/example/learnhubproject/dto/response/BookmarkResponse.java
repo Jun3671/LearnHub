@@ -21,6 +21,9 @@ public class BookmarkResponse {
     private String title;
     private String description;
     private String thumbnailUrl;
+    private String imageUrl;
+    private String metaTitle;
+    private String metaDescription;
     private CategoryResponse category;
     private List<TagResponse> tags;
     private LocalDateTime createdAt;
@@ -32,6 +35,9 @@ public class BookmarkResponse {
                 .title(bookmark.getTitle())
                 .description(bookmark.getDescription())
                 .thumbnailUrl(bookmark.getS3ThumbnailUrl())
+                .imageUrl(bookmark.getImageUrl())
+                .metaTitle(bookmark.getMetaTitle())
+                .metaDescription(bookmark.getMetaDescription())
                 .category(CategoryResponse.from(bookmark.getCategory()))
                 .tags(bookmark.getBookmarkTags().stream()
                         .map(BookmarkTag::getTag)

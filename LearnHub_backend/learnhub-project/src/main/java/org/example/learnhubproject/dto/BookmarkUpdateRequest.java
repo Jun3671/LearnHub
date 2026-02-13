@@ -33,6 +33,15 @@ public class BookmarkUpdateRequest {
     @Size(max = 2048, message = "썸네일 URL은 2048자 이하여야 합니다")
     private String thumbnailUrl;
 
+    @Size(max = 2048, message = "이미지 URL은 2048자 이하여야 합니다")
+    private String imageUrl;
+
+    @Size(max = 500, message = "메타 제목은 500자 이하여야 합니다")
+    private String metaTitle;
+
+    @Size(max = 1000, message = "메타 설명은 1000자 이하여야 합니다")
+    private String metaDescription;
+
     private Long categoryId;
 
     private List<String> tags;

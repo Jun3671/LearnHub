@@ -50,17 +50,21 @@ function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail, onCopyLink }) 
     window.open(bookmark.url, '_blank', 'noopener,noreferrer');
   };
 
+  const displayTitle = bookmark.metaTitle || bookmark.title || 'Untitled';
+  const displayDescription = bookmark.metaDescription || bookmark.description;
+  const thumbnailUrl = bookmark.imageUrl || bookmark.s3ThumbnailUrl;
+
   return (
-    <div className="group relative bg-white rounded-2xl border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+    <div className="group relative bg-white rounded-2xl border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 overflow-hidden cursor-pointer">
       {/* Thumbnail */}
       <div
         className="relative h-44 w-full bg-gradient-to-br from-neutral-100 to-neutral-50 overflow-hidden"
         onClick={handleCardClick}
       >
-        {bookmark.s3ThumbnailUrl && !imageError ? (
+        {thumbnailUrl && !imageError ? (
           <img
-            src={bookmark.s3ThumbnailUrl}
-            alt={bookmark.title}
+            src={thumbnailUrl}
+            alt={displayTitle}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={() => setImageError(true)}
           />
@@ -159,13 +163,13 @@ function BookmarkCard({ bookmark, onDelete, onEdit, onViewDetail, onCopyLink }) 
 
         {/* Title */}
         <h3 className="font-semibold text-neutral-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors leading-snug">
-          {bookmark.title || 'Untitled'}
+          {displayTitle}
         </h3>
 
         {/* Description */}
-        {bookmark.description && (
+        {displayDescription && (
           <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 mb-3">
-            {bookmark.description}
+            {displayDescription}
           </p>
         )}
 

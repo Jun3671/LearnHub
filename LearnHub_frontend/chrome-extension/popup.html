@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnHub Bookmark Saver</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+        </svg>
+        <span>LearnHub</span>
+      </div>
+      <button id="logout-btn" class="logout-btn hidden">로그아웃</button>
+    </header>
+
+    <!-- Login View -->
+    <div id="login-view" class="view hidden">
+      <p class="view-subtitle">계정에 로그인하여 북마크를 저장하세요</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">이메일</label>
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" placeholder="비밀번호" required>
+        </div>
+        <div id="login-error" class="error-msg hidden"></div>
+        <button type="submit" id="login-btn" class="btn-primary">로그인</button>
+      </form>
+    </div>
+
+    <!-- Bookmark View -->
+    <div id="bookmark-view" class="view hidden">
+      <!-- Warning for non-bookmarkable pages -->
+      <div id="page-warning" class="warning-msg hidden">
+        이 페이지는 북마크로 저장할 수 없습니다.
+      </div>
+
+      <form id="bookmark-form">
+        <div class="form-group">
+          <label for="bm-url">URL</label>
+          <input type="url" id="bm-url" readonly>
+        </div>
+        <div class="form-group">
+          <label for="bm-title">제목</label>
+          <input type="text" id="bm-title" placeholder="페이지 제목" required>
+        </div>
+        <div class="form-group">
+          <label for="bm-description">설명 (선택)</label>
+          <textarea id="bm-description" rows="3" placeholder="간단한 설명을 입력하세요"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="bm-category">카테고리</label>
+          <select id="bm-category" required>
+            <option value="">카테고리를 선택하세요</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bm-tags">태그 (쉼표로 구분)</label>
+          <input type="text" id="bm-tags" placeholder="React, Spring, Tutorial">
+        </div>
+        <div id="bookmark-error" class="error-msg hidden"></div>
+        <div id="bookmark-success" class="success-msg hidden">저장 완료!</div>
+        <button type="submit" id="save-btn" class="btn-primary">저장하기</button>
+      </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay hidden">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
