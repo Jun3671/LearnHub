@@ -9,6 +9,7 @@ import EditCategoryModal from '../components/EditCategoryModal';
 import ConfirmModal from '../components/ConfirmModal';
 import Toast from '../components/Toast';
 import BookmarkDetailModal from '../components/BookmarkDetailModal';
+import ReviewDashboard from '../components/ReviewDashboard';
 import { BookmarkSkeletonGrid } from '../components/BookmarkSkeleton';
 
 function Dashboard() {
@@ -33,6 +34,7 @@ function Dashboard() {
   const [confirmModalType, setConfirmModalType] = useState('bookmark');
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('bookmarks'); // 'bookmarks' or 'review'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -237,17 +239,25 @@ function Dashboard() {
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               <button
-                onClick={() => { setSelectedCategory(null); setSelectedTags([]); }}
+                onClick={() => { setActiveTab('bookmarks'); setSelectedCategory(null); setSelectedTags([]); }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !selectedCategory ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-100'
+                  activeTab === 'bookmarks' && !selectedCategory ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-100'
                 }`}
               >
                 🏠 홈
               </button>
-              {categories.slice(0, 4).map((cat) => (
+              <button
+                onClick={() => setActiveTab('review')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'review' ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-100'
+                }`}
+              >
+                📚 복습
+              </button>
+              {categories.slice(0, 3).map((cat) => (
                 <button
                   key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => { setActiveTab('bookmarks'); setSelectedCategory(cat.id); }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedCategory === cat.id ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-100'
                   }`}
@@ -255,7 +265,7 @@ function Dashboard() {
                   {cat.name}
                 </button>
               ))}
-              {categories.length > 4 && (
+              {categories.length > 3 && (
                 <button
                   onClick={() => setSidebarOpen(true)}
                   className="px-4 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors"
@@ -458,31 +468,35 @@ function Dashboard() {
 
           {/* Bookmark Grid */}
           <div className="flex-1">
-            {/* Section Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-neutral-800">
-                  {selectedCategory
-                    ? categories.find(c => c.id === selectedCategory)?.name
-                    : '전체 북마크'}
-                </h2>
-                <p className="text-sm text-neutral-500 mt-1">
-                  {filteredBookmarks.length}개의 북마크
-                  {selectedTags.length > 0 && ` · ${selectedTags.map(t => '#' + t).join(', ')} 필터 적용`}
-                </p>
-              </div>
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                카테고리
-              </button>
-            </div>
+            {activeTab === 'review' ? (
+              <ReviewDashboard />
+            ) : (
+              <>
+                {/* Section Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-neutral-800">
+                      {selectedCategory
+                        ? categories.find(c => c.id === selectedCategory)?.name
+                        : '전체 북마크'}
+                    </h2>
+                    <p className="text-sm text-neutral-500 mt-1">
+                      {filteredBookmarks.length}개의 북마크
+                      {selectedTags.length > 0 && ` · ${selectedTags.map(t => '#' + t).join(', ')} 필터 적용`}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="lg:hidden flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    카테고리
+                  </button>
+                </div>
 
-            {loading ? (
+                {loading ? (
               <BookmarkSkeletonGrid count={6} />
             ) : filteredBookmarks.length === 0 ? (
               <div className="text-center py-20 px-4">
@@ -521,6 +535,8 @@ function Dashboard() {
                   />
                 ))}
               </div>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -73,4 +73,12 @@ export const tagAPI = {
   getPopular: () => api.get('/tags/popular'),
 };
 
+// Review API
+export const reviewAPI = {
+  getTodayReviews: () => api.get('/reviews/today'),
+  completeReview: (bookmarkId) => api.post(`/reviews/complete/${bookmarkId}`),
+  getReviewStats: () => api.get('/reviews/stats'),
+  getAllReviewLogs: () => api.get('/reviews/all'),
+};
+
 export default api;
