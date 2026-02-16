@@ -67,6 +67,9 @@ public class Bookmark {
     /**
      * 프론트엔드에서 쉽게 접근할 수 있도록 태그 정보를 제공
      */
+    @OneToMany(mappedBy = "bookmark", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLog> reviewLogs = new ArrayList<>();
+
     @JsonProperty("tags")
     public List<TagInfo> getTags() {
         if (bookmarkTags == null) {
