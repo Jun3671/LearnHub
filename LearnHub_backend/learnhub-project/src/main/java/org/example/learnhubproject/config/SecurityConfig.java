@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // 로그인, 회원가입 허용
                         .requestMatchers("/api/bookmarks/analyze").permitAll() // AI 분석 API 허용
+                        .requestMatchers("/api/tech-glossary/**").permitAll() // 기술 용어 API 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )

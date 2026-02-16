@@ -198,4 +198,130 @@ public class AIAnalysisService {
 
         return response.substring(start, end + 1);
     }
+
+    /**
+     * 텍스트에서 기술 용어 추출
+     */
+    public List<String> extractTechTerms(String text) {
+        log.debug("기술 용어 추출 시작");
+
+        String prompt = String.format("""
+                다음 텍스트에서 개발 기술 용어(프레임워크, 라이브러리, 개념, 도구 등)를 추출해주세요:
+
+                "%s"
+
+                조건:
+                - 초보 개발자가 모를 수 있는 전문 용어만 추출
+                - 최대 10개
+                - JSON 배열 형식으로 반환: ["Redis", "Docker", "JWT"]
+                - 반드시 JSON 배열 형식으로만 응답하고, 다른 설명은 포함하지 마세요
+                """, text);
+
+        try {
+            String aiResponse = callGeminiAPI(prompt);
+
+            // JSON 배열 파싱
+            String jsonArray = aiResponse.trim();
+            if (jsonArray.startsWith("```json")) {
+                jsonArray = jsonArray.substring(7);
+            }
+            if (jsonArray.endsWith("```")) {
+                jsonArray = jsonArray.substring(0, jsonArray.length() - 3);
+            }
+            jsonArray = jsonArray.trim();
+
+            List<String> terms = objectMapper.readValue(jsonArray,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+
+            log.debug("기술 용어 추출 완료: {} 개", terms.size());
+            return terms;
+        } catch (Exception e) {
+            log.error("기술 용어 추출 실패", e);
+            return List.of();
+        }
+    }
+
+    /**
+     * 기술 용어의 정의 생성
+     */
+    public String generateTermDefinition(String term) {
+        log.debug("용어 정의 생성 시작: {}", term);
+
+        String prompt = String.format("""
+                개발 초보자가 이해하기 쉽게 '%s' 기술 용어를 설명해주세요.
+
+                조건:
+                - 2-3문장으로 간결하게
+                - 정의, 용도, 대표 사례를 포함
+                - 전문 용어는 최소화하고 쉬운 말로 설명
+                - 설명만 작성하고, 다른 내용은 포함하지 마세요
+
+                예시 형식:
+                "Redis는 메모리 기반의 Key-Value 저장소입니다. 데이터베이스 조회 결과를 캐싱하여 응답 속도를 높이는 데 주로 사용됩니다. 세션 관리, 실시간 랭킹 시스템 등에 활용됩니다."
+                """, term);
+
+        try {
+            String definition = callGeminiAPI(prompt).trim();
+
+            // 불필요한 마크다운 제거
+            if (definition.startsWith("```")) {
+                definition = definition.replaceAll("```[a-z]*\\n", "").replaceAll("```", "").trim();
+            }
+
+            log.debug("용어 정의 생성 완료: {}", term);
+            return definition;
+        } catch (Exception e) {
+            log.error("용어 정의 생성 실패: {}", term, e);
+            throw new RuntimeException("용어 정의 생성 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gemini API 공통 호출 메서드
+     */
+    private String callGeminiAPI(String prompt) {
+        if (geminiApiKey == null || geminiApiKey.isEmpty()) {
+            throw new RuntimeException("Gemini API 키가 설정되지 않았습니다.");
+        }
+
+        try {
+            // Gemini API 요청 본문 생성
+            Map<String, Object> requestBody = new HashMap<>();
+            Map<String, Object> part = new HashMap<>();
+            part.put("text", prompt);
+
+            Map<String, Object> content = new HashMap<>();
+            content.put("parts", List.of(part));
+
+            requestBody.put("contents", List.of(content));
+
+            // HTTP 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("x-goog-api-key", geminiApiKey);
+
+            // HTTP 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            // API 호출
+            ResponseEntity<String> response = restTemplate.exchange(
+                    GEMINI_API_URL,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            // 응답 파싱
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            return rootNode
+                    .path("candidates").get(0)
+                    .path("content")
+                    .path("parts").get(0)
+                    .path("text").asText();
+
+        } catch (Exception e) {
+            log.error("Gemini API 호출 실패", e);
+            throw new RuntimeException("AI 분석 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
 }

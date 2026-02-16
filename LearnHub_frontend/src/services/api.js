@@ -73,4 +73,12 @@ export const tagAPI = {
   getPopular: () => api.get('/tags/popular'),
 };
 
+// Tech Glossary API
+export const techGlossaryAPI = {
+  getTermDefinition: (termName) => api.get(`/tech-glossary/term/${encodeURIComponent(termName)}`),
+  extractTerms: (text) => api.post('/tech-glossary/extract', { text }),
+  getAllTerms: () => api.get('/tech-glossary'),
+  getTermById: (id) => api.get(`/tech-glossary/${id}`),
+};
+
 export default api;
