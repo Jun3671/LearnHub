@@ -8,6 +8,7 @@ import org.example.learnhubproject.repository.BookmarkRepository;
 import org.example.learnhubproject.repository.BookmarkTagRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookmarkService {
 
@@ -26,6 +26,22 @@ public class BookmarkService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final ReviewService reviewService;
+
+    public BookmarkService(
+            BookmarkRepository bookmarkRepository,
+            BookmarkTagRepository bookmarkTagRepository,
+            UserService userService,
+            CategoryService categoryService,
+            TagService tagService,
+            @Lazy ReviewService reviewService) {
+        this.bookmarkRepository = bookmarkRepository;
+        this.bookmarkTagRepository = bookmarkTagRepository;
+        this.userService = userService;
+        this.categoryService = categoryService;
+        this.tagService = tagService;
+        this.reviewService = reviewService;
+    }
 
     /**
      * 북마크 소유권 검증
@@ -113,6 +129,13 @@ public class BookmarkService {
                         .build();
                 bookmarkTagRepository.save(bookmarkTag);
             }
+        }
+
+        // 복습 로그 초기화
+        try {
+            reviewService.initializeReviewLog(bookmark, user);
+        } catch (Exception e) {
+            log.warn("복습 로그 초기화 실패 (북마크 ID: {}): {}", bookmark.getId(), e.getMessage());
         }
 
         return bookmark;
