@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pageWarning = document.getElementById('page-warning');
   const loadingOverlay = document.getElementById('loading');
   const saveBtn = document.getElementById('save-btn');
+  const analyzeBtn = document.getElementById('analyze-btn');
 
   // --- Helper Functions ---
 
@@ -139,6 +140,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     showView(loginView);
     loginForm.reset();
     bookmarkForm.reset();
+  });
+
+  // --- AI Analyze ---
+
+  analyzeBtn.addEventListener('click', async () => {
+    const url = document.getElementById('bm-url').value;
+
+    if (!url) {
+      showError(bookmarkError, 'URL을 먼저 입력해주세요.');
+      return;
+    }
+
+    hideError(bookmarkError);
+    analyzeBtn.disabled = true;
+    analyzeBtn.classList.add('analyzing');
+
+    try {
+      const data = await apiRequest('/bookmarks/analyze', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
+      });
+
+      // Update form fields with AI analysis results
+      if (data.title) {
+        document.getElementById('bm-title').value = data.title;
+      }
+      if (data.description) {
+        document.getElementById('bm-description').value = data.description;
+      }
+      if (data.tags && data.tags.length > 0) {
+        document.getElementById('bm-tags').value = data.tags.join(', ');
+      }
+      if (data.suggestedCategory) {
+        document.getElementById('bm-category').value = data.suggestedCategory;
+      }
+    } catch (err) {
+      if (err.message === 'AUTH_EXPIRED') {
+        await removeToken();
+        showView(loginView);
+        showError(loginError, '세션이 만료되었습니다. 다시 로그인해주세요.');
+      } else {
+        showError(bookmarkError, err.message || 'AI 분석에 실패했습니다. 수동으로 입력해주세요.');
+      }
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeBtn.classList.remove('analyzing');
+    }
   });
 
   // --- Init Bookmark View ---

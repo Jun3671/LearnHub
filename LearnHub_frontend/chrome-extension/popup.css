@@ -76,6 +76,17 @@ body {
   margin-bottom: 14px;
 }
 
+/* URL Input Group */
+.url-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.url-input-group input {
+  flex: 1;
+}
+
 .form-group label {
   display: block;
   font-size: 13px;
@@ -153,6 +164,60 @@ body {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Analyze Button */
+.btn-analyze {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.25);
+}
+
+.btn-analyze:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.35);
+}
+
+.btn-analyze:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-analyze:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-analyze .icon-analyze {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.btn-analyze.analyzing .icon-analyze {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.btn-analyze.analyzing .analyze-text {
+  display: none;
+}
+
+.btn-analyze.analyzing .analyzing-text {
+  display: inline;
 }
 
 /* Messages */
