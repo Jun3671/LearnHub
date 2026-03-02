@@ -73,6 +73,17 @@ export const tagAPI = {
   getPopular: () => api.get('/tags/popular'),
 };
 
+// Tech Glossary API
+export const techGlossaryAPI = {
+  getAll: () => api.get('/tech-glossary'),
+  getById: (id) => api.get(`/tech-glossary/${id}`),
+  getByName: (name) => api.get(`/tech-glossary/term/${encodeURIComponent(name)}`),
+  extractTerms: (text) => api.post('/tech-glossary/extract', { text }),
+  create: (data) => api.post('/tech-glossary', data),
+  update: (id, data) => api.put(`/tech-glossary/${id}`, data),
+  delete: (id) => api.delete(`/tech-glossary/${id}`),
+};
+
 // Review API
 export const reviewAPI = {
   getTodayReviews: () => api.get('/reviews/today'),
