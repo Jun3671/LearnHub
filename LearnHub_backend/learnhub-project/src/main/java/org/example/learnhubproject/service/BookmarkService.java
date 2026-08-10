@@ -165,11 +165,11 @@ public class BookmarkService {
      * @param sort 정렬 기준 (latest: 최신순, oldest: 오래된순, title: 제목순)
      */
     public List<Bookmark> findByUserIdSorted(Long userId, String sort) {
-        // 유효하지 않은 정렬 옵션은 기본값(latest)으로 처리
-        if (!List.of("latest", "oldest", "title").contains(sort)) {
-            sort = "latest";
-        }
-        return bookmarkRepository.findByUserIdWithTagsSorted(userId, sort);
+        return switch (sort) {
+            case "oldest" -> bookmarkRepository.findByUserIdWithTagsOrderByCreatedAtAsc(userId);
+            case "title" -> bookmarkRepository.findByUserIdWithTagsOrderByTitleAsc(userId);
+            default -> bookmarkRepository.findByUserIdWithTags(userId);
+        };
     }
 
     public List<Bookmark> findByCategoryId(Long categoryId) {

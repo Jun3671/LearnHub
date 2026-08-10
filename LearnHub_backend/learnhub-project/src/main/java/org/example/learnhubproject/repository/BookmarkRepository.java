@@ -20,20 +20,21 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
            "ORDER BY b.createdAt DESC")
     List<Bookmark> findByUserIdWithTags(@Param("userId") Long userId);
 
-    /**
-     * 사용자의 북마크 조회 (정렬 옵션 포함)
-     * sort: latest(최신순), oldest(오래된순), title(제목순)
-     */
     @Query("SELECT DISTINCT b FROM Bookmark b " +
            "LEFT JOIN FETCH b.bookmarkTags bt " +
            "LEFT JOIN FETCH bt.tag " +
            "LEFT JOIN FETCH b.category " +
            "WHERE b.user.id = :userId " +
-           "ORDER BY " +
-           "CASE WHEN :sort = 'latest' THEN b.createdAt END DESC, " +
-           "CASE WHEN :sort = 'oldest' THEN b.createdAt END ASC, " +
-           "CASE WHEN :sort = 'title' THEN b.title END ASC")
-    List<Bookmark> findByUserIdWithTagsSorted(@Param("userId") Long userId, @Param("sort") String sort);
+           "ORDER BY b.createdAt ASC")
+    List<Bookmark> findByUserIdWithTagsOrderByCreatedAtAsc(@Param("userId") Long userId);
+
+    @Query("SELECT DISTINCT b FROM Bookmark b " +
+           "LEFT JOIN FETCH b.bookmarkTags bt " +
+           "LEFT JOIN FETCH bt.tag " +
+           "LEFT JOIN FETCH b.category " +
+           "WHERE b.user.id = :userId " +
+           "ORDER BY b.title ASC")
+    List<Bookmark> findByUserIdWithTagsOrderByTitleAsc(@Param("userId") Long userId);
 
     @Query("SELECT DISTINCT b FROM Bookmark b " +
            "LEFT JOIN FETCH b.bookmarkTags bt " +
