@@ -191,7 +191,7 @@ function StatCard({ icon, label, value, color, suffix }) {
 }
 
 function ReviewCard({ review, onComplete, completing, getNextInterval }) {
-  const { bookmark, reviewCount, nextReviewAt, lastReviewedAt } = review;
+  const { bookmark, reviewCount, lastReviewedAt } = review;
 
   const formatDate = (dateString) => {
     if (!dateString) return '';

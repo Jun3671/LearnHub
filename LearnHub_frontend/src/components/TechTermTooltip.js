@@ -17,6 +17,7 @@ function TechTermTooltip({ text, className = '' }) {
 
     // AI로 기술 용어 추출
     extractAndHighlightTerms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
   const extractAndHighlightTerms = async () => {
