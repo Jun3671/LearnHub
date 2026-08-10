@@ -23,6 +23,9 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
+# 헬스체크용 curl 설치
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # 빌드 스테이지에서 생성된 JAR 파일 복사
 COPY --from=builder /app/build/libs/*.jar app.jar
 
@@ -32,15 +35,15 @@ RUN useradd -m -s /bin/bash appuser && \
 
 USER appuser
 
-# 애플리케이션 포트 노출 (Spring Boot 기본 포트)
+# 애플리케이션 포트 노출
 EXPOSE 8080
 
-# 환경 변수 설정 (docker-compose에서 오버라이드 가능)
+# 프로덕션 프로파일 활성화
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# 헬스체크 (선택사항)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+# 헬스체크
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-Dspring.jpa.hibernate.ddl-auto=update", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
