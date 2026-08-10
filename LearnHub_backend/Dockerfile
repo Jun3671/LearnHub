@@ -4,16 +4,16 @@ FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
 # Gradle 캐시 활용을 위해 먼저 의존성 파일만 복사
-COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-COPY gradlew ./
+COPY learnhub-project/build.gradle learnhub-project/settings.gradle ./
+COPY learnhub-project/gradle ./gradle
+COPY learnhub-project/gradlew ./
 
 # 의존성 다운로드 (캐시 레이어)
 RUN ./gradlew dependencies --no-daemon || true
 
 RUN chmod +x ./gradlew
 # 소스 코드 복사
-COPY src ./src
+COPY learnhub-project/src ./src
 
 # 애플리케이션 빌드 (테스트 제외)
 RUN ./gradlew bootJar -x test --no-daemon
