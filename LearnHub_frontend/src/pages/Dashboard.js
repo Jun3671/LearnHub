@@ -15,7 +15,7 @@ import { BookmarkSkeletonGrid } from '../components/BookmarkSkeleton';
 function Dashboard() {
   const [bookmarks, setBookmarks] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [popularTags, setPopularTags] = useState([]);
+  const [, setPopularTags] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +39,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
