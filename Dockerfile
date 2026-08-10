@@ -4,16 +4,15 @@ FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
 # Gradle 캐시 활용을 위해 먼저 의존성 파일만 복사
-COPY learnhub-project/build.gradle learnhub-project/settings.gradle ./
-COPY learnhub-project/gradle ./gradle
-COPY learnhub-project/gradlew ./
+COPY LearnHub_backend/learnhub-project/build.gradle LearnHub_backend/learnhub-project/settings.gradle ./
+COPY LearnHub_backend/learnhub-project/gradle ./gradle
+COPY LearnHub_backend/learnhub-project/gradlew ./
 
 # 의존성 다운로드 (캐시 레이어)
-RUN ./gradlew dependencies --no-daemon || true
+RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon || true
 
-RUN chmod +x ./gradlew
 # 소스 코드 복사
-COPY learnhub-project/src ./src
+COPY LearnHub_backend/learnhub-project/src ./src
 
 # 애플리케이션 빌드 (테스트 제외)
 RUN ./gradlew bootJar -x test --no-daemon
@@ -35,15 +34,11 @@ RUN useradd -m -s /bin/bash appuser && \
 
 USER appuser
 
-# 애플리케이션 포트 노출
 EXPOSE 8080
 
-# 프로덕션 프로파일 활성화
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# 헬스체크
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# 애플리케이션 실행
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
